@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.NewFlowInvestorMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="org.example.entity.NewFlowInvertor">
+        <id column="id" property="id" />
+        <result column="ts_code" property="tsCode" />
+        <result column="symbol" property="symbol" />
+        <result column="name" property="name" />
+        <result column="ann_date" property="annDate" />
+        <result column="end_date" property="endDate" />
+        <result column="all_holder_name " property="allHolderName" />
+        <result column="total_hold_amount " property="totalHoldAmount" />
+        <result column="last_hold_amount " property="lastHoldAmount" />
+        <result column="last_hold_ratio " property="lastHoldRatio" />
+        <result column="last_hold_float_ratio " property="lastHoldFloatRatio" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO new_flow_investor (ts_code,symbol,name, ann_date, end_date, all_holder_name,total_hold_amount, last_hold_amount,last_hold_ratio,last_hold_float_ratio)
+        VALUES
+        <foreach collection="flowInvestors" item="flow" separator=",">
+            (#{flow.tsCode},#{flow.symbol},#{flow.name}, #{flow.annDate}, #{flow.endDate},
+            #{flow.allHolderName}, #{flow.totalHoldAmount}, #{flow.lastHoldAmount}, #{flow.lastHoldRatio}, #{flow.lastHoldFloatRatio})
+        </foreach>
+    </insert>
+</mapper>

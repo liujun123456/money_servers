@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.AllAndLastFlowMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="org.example.entity.AllAndLastFlow">
+        <id column="id" property="id" />
+        <result column="ts_code" property="tsCode" />
+        <result column="symbol" property="symbol" />
+        <result column="name" property="name" />
+        <result column="ten_holder_amout" property="tenAmount" />
+        <result column="total_hold_amount" property="totalAmount" />
+        <result column="last_hold_amount" property="lastFlowHoldAmount" />
+        <result column="end_date" property="endDate" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO all_and_last_flow (ts_code,symbol, name, end_date, ten_holder_amout, total_hold_amount,last_hold_amount)
+        VALUES
+        <foreach collection="allAndLastFlows" item="flow" separator=",">
+            (#{flow.tsCode}, #{flow.symbol}, #{flow.name}, #{flow.endDate},
+            #{flow.tenAmount}, #{flow.totalAmount}, #{flow.lastFlowHoldAmount})
+        </foreach>
+    </insert>
+</mapper>

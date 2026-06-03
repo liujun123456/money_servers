@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.KongPanMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="org.example.entity.KongPan">
+        <id column="id" property="id" />
+        <result column="symbol" property="symbol" />
+        <result column="name" property="name" />
+        <result column="total_flow" property="totalFlow" />
+        <result column="ten_person_flow" property="tenPersonFlow" />
+        <result column="person_num" property="personNum" />
+        <result column="factor" property="factor" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO kong_pan (symbol, name, total_flow, ten_person_flow, person_num,factor)
+        VALUES
+        <foreach collection="kongPanList" item="kongPan" separator=",">
+            (#{kongPan.symbol}, #{kongPan.name}, #{kongPan.total_flow},
+            #{kongPan.ten_person_flow}, #{kongPan.person_num}, #{kongPan.factor})
+        </foreach>
+    </insert>
+</mapper>

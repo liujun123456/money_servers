@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: mybatis-springboot-demo
+
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://139.196.24.112:3306/stock_info?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+    username: root
+    password: liujun
+
+  # H2数据库配置（测试用）
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # SQL初始化
+  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:sql/schema.sql
+
+# MyBatis配置
+mybatis:
+  # Mapper XML文件位置
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类包路径
+  type-aliases-package: org.example.entity
+  configuration:
+    # 开启驼峰命名自动映射
+    map-underscore-to-camel-case: true
+    # 打印SQL日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
+logging:
+  level:
+    com.example.demo.mapper: DEBUG
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+
+okhttp:
+  # 连接超时时间(毫秒)
+  connect-timeout: 15000
+  # 读取超时时间(毫秒)
+  read-timeout: 10000
+  # 写入超时时间(毫秒)
+  write-timeout: 10000
+  # 连接池最大空闲连接数
+  max-idle-connections: 5
+  # 连接保活时间(分钟)
+  keep-alive-duration: 5
+  # 是否开启重试
+  retry-on-connection-failure: true
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /api
