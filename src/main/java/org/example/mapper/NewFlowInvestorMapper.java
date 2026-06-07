@@ -31,5 +31,8 @@ public interface NewFlowInvestorMapper {
     @Select("SELECT name,symbol,end_date as endDate,all_holder_name as allHolderName FROM new_flow_investor  WHERE symbol = #{code}")
     List<NiuSanResp> queryNewSanByCode(String code);
 
+    @Select("SELECT * FROM new_flow_investor where end_date > #{startTime} and end_date< #{endTime}")
+    List<NiuSanResp> selectByTime(String startTime,String endTime);
+
 
 }

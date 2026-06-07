@@ -46,9 +46,16 @@ public class MoneyController {
         return ResponseDTO.success(moneyService.queryNiuSanByCode(code));
     }
 
+    @GetMapping("niusan/connect/{type}/{startTime}/{endTime}")
+    public ResponseDTO<List<NiuSanResp>> getSymbolByTime(@PathVariable String type,@PathVariable String startTime,@PathVariable String endTime){
+        return ResponseDTO.success(moneyService.selectConnectByNameAndTime(type,startTime,endTime));
+    }
+
     @GetMapping("niuSan/connection/{name}")
     public ResponseDTO<List<NiuSanConnect>> getNiuSanConnectByName(@PathVariable String name){
         return ResponseDTO.success(moneyService.getNiuSanConnectByName(name));
     }
+
+
 
 }

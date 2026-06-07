@@ -12,6 +12,7 @@ public class NiuSanResp {
    public String endDate;
    public String allHolderName;
    public List<String> holderNameList;
+   public List<String> pickName=new ArrayList<>();
 
    public List<NiuSanResp> childNiuSanList=new ArrayList<>();
 

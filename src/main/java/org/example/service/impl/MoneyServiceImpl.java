@@ -113,6 +113,77 @@ public class MoneyServiceImpl implements MoneyService {
         return resps;
     }
 
+    /**
+     * type 1 夏重阳夫妇
+     * @param type
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @Override
+    public List<NiuSanResp> selectConnectByNameAndTime(String type,String startTime, String endTime) {
+        List<NiuSanResp> realResp=new ArrayList<>();
+        List<NiuSanResp> niuSanResps=newFlowInvestorMapper.selectByTime(startTime,endTime);
+
+        for (int index=0;index<niuSanResps.size();index++){
+            NiuSanResp resp=niuSanResps.get(index);
+            List<String> nameList=new ArrayList<>();
+            if (!StringUtils.isEmpty(resp.allHolderName)){
+                String[] names=resp.allHolderName.split(",");
+                nameList.addAll(Arrays.asList(names));
+            }
+            resp.setHolderNameList(nameList);
+        }
+
+        if (type.equals("1")){
+            Map<String,NiuSanResp> map=pickByXiaChongYang(niuSanResps);
+            for (String key : map.keySet()) {
+                realResp.add(map.get(key));
+            }
+        }
+        return realResp;
+    }
+
+
+    private Map<String,NiuSanResp>  pickByXiaChongYang(List<NiuSanResp> niuSanResps){
+        Map<String,NiuSanResp> mapResource=new HashMap<>();
+        Map<String,NiuSanResp> map2=new HashMap<>();
+        List<NiuSanConnect> niuSanConnectList=niuSanConnectMapper.queryConnectByName("夏重阳");
+        getPickSymbol(mapResource, niuSanConnectList, niuSanResps);
+
+        List<NiuSanConnect> niuSanConnectList2=niuSanConnectMapper.queryConnectByName("张素芬");
+        getPickSymbol(map2, niuSanConnectList2, niuSanResps);
+
+        for (String key : map2.keySet()) {
+            if (!mapResource.containsKey(key)){
+                mapResource.put(key,map2.get(key));
+            }
+        }
+        return mapResource;
+    }
+
+
+    private Map<String,NiuSanResp> getPickSymbol(Map<String,NiuSanResp> map ,List<NiuSanConnect> niuSanConnectList, List<NiuSanResp> niuSanResps){
+        for (NiuSanResp niuSanResp : niuSanResps) {
+            if (niuSanResp.getPickName().size()>=2)continue;
+            int pickCount=0;
+            for (NiuSanConnect niuSanConnect : niuSanConnectList) {
+                if (niuSanResp.getHolderNameList().contains(niuSanConnect.getSecondPeople())){
+                    pickCount++;
+                    if (pickCount>=2){
+                        niuSanResp.getPickName().add(niuSanConnect.getSecondPeople());
+                        map.put(niuSanResp.name,niuSanResp);
+                        break;
+                    }else {
+                        niuSanResp.getPickName().add(niuSanConnect.getSecondPeople());
+                    }
+                }
+            }
+        }
+
+        return map;
+    }
+
 
     @Override
     public List<NiuSanConnect>  getNiuSanConnectByName(String name) {

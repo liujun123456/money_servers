@@ -17,6 +17,10 @@ public interface MoneyService {
 
     List<NiuSanResp> queryNiuSanByCode(String code);
 
+    List<NiuSanResp> selectConnectByNameAndTime(String type,String startTime,String endTime);
+
     List<NiuSanConnect> getNiuSanConnectByName(String name);
+
+
 
 }
