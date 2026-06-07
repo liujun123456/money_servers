@@ -1,7 +1,8 @@
 package org.example.service.impl;
 
-import org.example.entity.NewFlowInvertor;
+import org.example.entity.NiuSanConnect;
 import org.example.mapper.NewFlowInvestorMapper;
+import org.example.mapper.NiuSanConnectMapper;
 import org.example.resp.NiuSanResp;
 import org.example.service.MoneyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class MoneyServiceImpl implements MoneyService {
 
     @Autowired
     private NewFlowInvestorMapper newFlowInvestorMapper;
+
+    @Autowired
+    private NiuSanConnectMapper  niuSanConnectMapper;
 
     @Override
     public List<NiuSanResp> queryNiuSanByName(String name) {
@@ -107,5 +111,79 @@ public class MoneyServiceImpl implements MoneyService {
             resp.setHolderNameList(nameList);
         }
         return resps;
+    }
+
+
+    @Override
+    public List<NiuSanConnect>  getNiuSanConnectByName(String name) {
+        return niuSanConnectMapper.queryConnectByName(name);
+    }
+
+    private String insertNiuSanConnect(String name){
+        List<NiuSanResp> resps= newFlowInvestorMapper.queryNewSanByName(name);
+
+        Iterator<NiuSanResp> iterator = resps.iterator();   //剔除牛散模糊搜索出来的其他股票
+        while (iterator.hasNext()) {
+            NiuSanResp resp = iterator.next();
+            String[] names=resp.getAllHolderName().split(",");
+            boolean contains = Arrays.asList(names).contains(name);
+            if (!contains){
+                iterator.remove();
+            }
+        }
+
+
+        //查询出该牛散做过的所有股票
+
+        Set<String> symbols=new HashSet<>();
+        for (NiuSanResp resp:resps){
+            symbols.add(resp.getSymbol()+","+resp.getName());
+        }
+
+        Map<String,NiuSanConnect> maps=new HashMap<>();
+        //记录每一只股票里出现过的所有牛散
+        for (String symbol : symbols) {
+            String symbolCode=symbol.split(",")[0];
+            String symbolName=symbol.split(",")[1];
+            List<NiuSanResp> respList=newFlowInvestorMapper.queryNewSanByCode(symbolCode);
+            Set<String> symbolsWithName=new HashSet<>();   //获取每只股票里不重复的牛散
+            for (NiuSanResp resp : respList) {
+                String[] names=resp.getAllHolderName().split(",");
+                for (String niusan : names) {
+                    if (!(niusan.isEmpty()||niusan.equals(name))){
+                        symbolsWithName.add(niusan);
+                    }
+
+                }
+            }
+
+            for (String s : symbolsWithName) {
+                if (maps.containsKey(s)){
+                    int count=Integer.parseInt(maps.get(s).getConnectCount());
+                    count=count+1;
+                    maps.get(s).setConnectCount(count+"");
+                    String currentSymbolName= maps.get(s).getConnectSymbol();
+                    maps.get(s).setConnectSymbol(currentSymbolName+","+symbolName);
+                }else {
+                    NiuSanConnect niuSanConnect=new NiuSanConnect();
+                    niuSanConnect.setConnectCount("1");
+                    niuSanConnect.setSecondPeople(s);
+                    niuSanConnect.setFirstPeople(name);
+                    niuSanConnect.setConnectSymbol(symbolName);
+                    maps.put(s,niuSanConnect);
+                }
+            }
+
+        }
+
+        List<NiuSanConnect> niuSanConnects=new ArrayList<>();
+        for (String niusan : maps.keySet()) {  //从map中取出所有相关数据，count小于2的剔除
+            NiuSanConnect connect=maps.get(niusan);
+            if (Integer.parseInt(connect.getConnectCount())>1){
+                niuSanConnects.add(connect);
+            }
+        }
+        niuSanConnectMapper.batchInsert(niuSanConnects);
+        return "成功";
     }
 }

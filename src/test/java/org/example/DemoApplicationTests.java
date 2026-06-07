@@ -7,6 +7,7 @@ import org.example.mapper.*;
 import org.example.req.FlowParamReq;
 import org.example.req.StockReq;
 import org.example.resp.HolderResp;
+import org.example.service.MoneyService;
 import org.example.utils.HttpUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,6 +41,9 @@ class DemoApplicationTests {
 
     @Autowired
     private HttpUtils utils;
+
+    @Autowired
+    private MoneyService moneyService;
 
     //@Test
     void contextLoads() {
@@ -496,4 +500,10 @@ class DemoApplicationTests {
         System.out.println(stockCode);
 
     }
+
+//    @Test
+//    void queryConnect(){
+//        moneyService.getNiuSanConnectByName("夏重阳");
+//
+//    }
 }

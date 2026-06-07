@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.dto.ResponseDTO;
+import org.example.entity.NiuSanConnect;
 import org.example.resp.NiuSanResp;
 import org.example.service.MoneyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/money")
@@ -38,9 +40,15 @@ public class MoneyController {
         return ResponseDTO.success(moneyService.getNiuSanByNameV2(name));
     }
 
+
     @GetMapping("symbol/{code}")
     public ResponseDTO<List<NiuSanResp>> getNiuSanBySymbol(@PathVariable String code){
         return ResponseDTO.success(moneyService.queryNiuSanByCode(code));
+    }
+
+    @GetMapping("niuSan/connection/{name}")
+    public ResponseDTO<List<NiuSanConnect>> getNiuSanConnectByName(@PathVariable String name){
+        return ResponseDTO.success(moneyService.getNiuSanConnectByName(name));
     }
 
 }
