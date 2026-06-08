@@ -168,6 +168,7 @@ public class MoneyServiceImpl implements MoneyService {
     private Map<String,NiuSanResp> getPickSymbol(Map<String,NiuSanResp> map ,List<NiuSanConnect> niuSanConnectList, List<NiuSanResp> niuSanResps){
         for (NiuSanResp niuSanResp : niuSanResps) {
             if (niuSanResp.getPickName().size()>=2)continue;
+            niuSanResp.getPickName().clear();
             int pickCount=0;
             for (NiuSanConnect niuSanConnect : niuSanConnectList) {
                 if (niuSanResp.getHolderNameList().contains(niuSanConnect.getSecondPeople())){
