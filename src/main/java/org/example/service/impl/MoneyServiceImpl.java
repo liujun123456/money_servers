@@ -122,6 +122,8 @@ public class MoneyServiceImpl implements MoneyService {
      */
     @Override
     public List<NiuSanResp> selectConnectByNameAndTime(String type,String startTime, String endTime) {
+        startTime=startTime.replaceAll("-","");
+        endTime=endTime.replaceAll("-","");
         List<NiuSanResp> realResp=new ArrayList<>();
         List<NiuSanResp> niuSanResps=newFlowInvestorMapper.selectByTime(startTime,endTime);
 
@@ -186,8 +188,13 @@ public class MoneyServiceImpl implements MoneyService {
 
 
     @Override
-    public List<NiuSanConnect>  getNiuSanConnectByName(String name) {
-        return niuSanConnectMapper.queryConnectByName(name);
+    public List<NiuSanConnect>  getNiuSanConnectByName(String type) {
+        List<NiuSanConnect> niuSanConnectList=new ArrayList<>();;
+        if (type.equals("1")){
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("夏重阳"));
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("张素芬"));
+        }
+        return niuSanConnectList;
     }
 
     private String insertNiuSanConnect(String name){

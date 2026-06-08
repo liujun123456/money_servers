@@ -22,11 +22,6 @@ public class MoneyController {
     @Autowired
     private MoneyService moneyService;
 
-//    @GetMapping("/{id}")
-//    public ResponseDTO<User> getUserById(@PathVariable Long id) {
-//        User user = userService.getUserById(id);
-//        return ResponseDTO.success(user);
-//    }
 
     @GetMapping("niuSan/{name}")
     public ResponseDTO<List<NiuSanResp>> getNiuSanByName(@PathVariable String name){
@@ -51,9 +46,9 @@ public class MoneyController {
         return ResponseDTO.success(moneyService.selectConnectByNameAndTime(type,startTime,endTime));
     }
 
-    @GetMapping("niuSan/connection/{name}")
-    public ResponseDTO<List<NiuSanConnect>> getNiuSanConnectByName(@PathVariable String name){
-        return ResponseDTO.success(moneyService.getNiuSanConnectByName(name));
+    @GetMapping("niuSan/connection/{type}")
+    public ResponseDTO<List<NiuSanConnect>> getNiuSanConnectByName(@PathVariable String type){
+        return ResponseDTO.success(moneyService.getNiuSanConnectByName(type));
     }
 
 
