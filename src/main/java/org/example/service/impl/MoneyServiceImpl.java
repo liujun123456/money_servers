@@ -142,10 +142,14 @@ public class MoneyServiceImpl implements MoneyService {
             for (String key : map.keySet()) {
                 realResp.add(map.get(key));
             }
+        }else if (type.equals("2")){
+            Map<String,NiuSanResp> map=pickByXuXiang(niuSanResps);
+            for (String key : map.keySet()) {
+                realResp.add(map.get(key));
+            }
         }
         return realResp;
     }
-
 
     private Map<String,NiuSanResp>  pickByXiaChongYang(List<NiuSanResp> niuSanResps){
         Map<String,NiuSanResp> mapResource=new HashMap<>();
@@ -159,6 +163,57 @@ public class MoneyServiceImpl implements MoneyService {
         for (String key : map2.keySet()) {
             if (!mapResource.containsKey(key)){
                 mapResource.put(key,map2.get(key));
+            }
+        }
+        return mapResource;
+    }
+
+
+
+
+    private Map<String,NiuSanResp>  pickByXuXiang(List<NiuSanResp> niuSanResps){
+        Map<String,NiuSanResp> mapResource=new HashMap<>();
+
+        List<NiuSanConnect> niuSanConnectList=niuSanConnectMapper.queryConnectByName("徐翔");
+        getPickSymbol(mapResource, niuSanConnectList, niuSanResps);
+
+        Map<String,NiuSanResp> mapWxa=new HashMap<>();
+        List<NiuSanConnect> niuSanConnectListWxa=niuSanConnectMapper.queryConnectByName("王孝安");
+        getPickSymbol(mapWxa, niuSanConnectListWxa, niuSanResps);
+
+        for (String key : mapWxa.keySet()) {
+            if (!mapResource.containsKey(key)){
+                mapResource.put(key,mapWxa.get(key));
+            }
+        }
+
+        Map<String,NiuSanResp> mapGwd=new HashMap<>();
+        List<NiuSanConnect> niuSanConnectListGwd=niuSanConnectMapper.queryConnectByName("葛卫东");
+        getPickSymbol(mapGwd, niuSanConnectListGwd, niuSanResps);
+
+        for (String key : mapGwd.keySet()) {
+            if (!mapResource.containsKey(key)){
+                mapResource.put(key,mapGwd.get(key));
+            }
+        }
+
+        Map<String,NiuSanResp> mapMx=new HashMap<>();
+        List<NiuSanConnect> niuSanConnectListMx=niuSanConnectMapper.queryConnectByName("马渲");
+        getPickSymbol(mapMx, niuSanConnectListMx, niuSanResps);
+
+        for (String key : mapMx.keySet()) {
+            if (!mapResource.containsKey(key)){
+                mapResource.put(key,mapMx.get(key));
+            }
+        }
+
+        Map<String,NiuSanResp> mapTwb=new HashMap<>();
+        List<NiuSanConnect> niuSanConnectListTwb=niuSanConnectMapper.queryConnectByName("屠文斌");
+        getPickSymbol(mapTwb, niuSanConnectListTwb, niuSanResps);
+
+        for (String key : mapTwb.keySet()) {
+            if (!mapResource.containsKey(key)){
+                mapResource.put(key,mapTwb.get(key));
             }
         }
         return mapResource;
@@ -194,6 +249,12 @@ public class MoneyServiceImpl implements MoneyService {
         if (type.equals("1")){
             niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("夏重阳"));
             niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("张素芬"));
+        }else if (type.equals("2")){
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("马渲"));
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("葛卫东"));
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("屠文斌"));
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("王孝安"));
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("徐翔"));
         }
         return niuSanConnectList;
     }
