@@ -211,6 +211,16 @@ public class MoneyServiceImpl implements MoneyService {
         List<NiuSanConnect> niuSanConnectListTwb=niuSanConnectMapper.queryConnectByName("屠文斌");
         getPickSymbol(mapTwb, niuSanConnectListTwb, niuSanResps);
 
+
+        Map<String,NiuSanResp> mapZjp=new HashMap<>();
+        List<NiuSanConnect> niuSanConnectListZjp=niuSanConnectMapper.queryConnectByName("章建平");
+        getPickSymbol(mapZjp, niuSanConnectListZjp, niuSanResps);
+
+
+        Map<String,NiuSanResp> mapSyq=new HashMap<>();
+        List<NiuSanConnect> niuSanConnectListSyq=niuSanConnectMapper.queryConnectByName("施玉庆");
+        getPickSymbol(mapSyq, niuSanConnectListSyq, niuSanResps);
+
         for (String key : mapTwb.keySet()) {
             if (!mapResource.containsKey(key)){
                 mapResource.put(key,mapTwb.get(key));
@@ -255,6 +265,8 @@ public class MoneyServiceImpl implements MoneyService {
             niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("屠文斌"));
             niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("王孝安"));
             niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("徐翔"));
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("章建平"));
+            niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("施玉庆"));
         }
         return niuSanConnectList;
     }
