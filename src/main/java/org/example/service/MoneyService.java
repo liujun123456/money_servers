@@ -22,5 +22,8 @@ public interface MoneyService {
     List<NiuSanConnect> getNiuSanConnectByName(String type);
 
 
+    void insertNiuSanConnect(String name);
+
+
 
 }

@@ -271,7 +271,7 @@ public class MoneyServiceImpl implements MoneyService {
         return niuSanConnectList;
     }
 
-    private String insertNiuSanConnect(String name){
+    public void insertNiuSanConnect(String name){
         List<NiuSanResp> resps= newFlowInvestorMapper.queryNewSanByName(name);
 
         Iterator<NiuSanResp> iterator = resps.iterator();   //剔除牛散模糊搜索出来的其他股票
@@ -336,6 +336,6 @@ public class MoneyServiceImpl implements MoneyService {
             }
         }
         niuSanConnectMapper.batchInsert(niuSanConnects);
-        return "成功";
+        System.out.println(name+"----插入成功");
     }
 }

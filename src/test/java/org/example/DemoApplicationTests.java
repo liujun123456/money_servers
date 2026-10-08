@@ -28,9 +28,6 @@ class DemoApplicationTests {
     private StockMapper stockMapper;
 
     @Autowired
-    private FlowInvestorMapper flowInvestorMapper;
-
-    @Autowired
     private NewFlowInvestorMapper newFlowInvestorMapper;
 
     @Autowired
@@ -68,7 +65,7 @@ class DemoApplicationTests {
     /**
      * 入库股票代码
      */
-    //@Test
+    @Test
     void testQueryStock(){
          StockReq req=new StockReq();
         req.setApi_name("stock_basic");
@@ -106,10 +103,10 @@ class DemoApplicationTests {
      * 入库十大流通股东信息到数据库
      * @throws Exception
      */
-    //@Test
+    @Test
     void testQueryFlow() throws Exception {
         List<Stock> stockList=stockMapper.selectAll();
-        for (int j=5118;j<stockList.size();j++){
+        for (int j=0;j<stockList.size();j++){
             Stock stock=stockList.get(j);
             StockReq req=new StockReq();
             req.setApi_name("top10_floatholders");
@@ -501,9 +498,19 @@ class DemoApplicationTests {
 
     }
 
-//    @Test
-//    void queryConnect(){
-//        moneyService.getNiuSanConnectByName("夏重阳");
-//
-//    }
+    @Test
+    void queryConnect(){
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("夏重阳"));
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("张素芬"));
+//    }else if (type.equals("2")){
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("马渲"));
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("葛卫东"));
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("屠文斌"));
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("王孝安"));
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("徐翔"));
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("章建平"));
+//        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("施玉庆"));
+        moneyService.insertNiuSanConnect("施玉庆");
+
+    }
 }
