@@ -5,6 +5,7 @@ package org.example;
 import org.example.entity.*;
 import org.example.mapper.*;
 import org.example.req.FlowParamReq;
+import org.example.req.LongHuReq;
 import org.example.req.StockReq;
 import org.example.resp.HolderResp;
 import org.example.service.MoneyService;
@@ -17,8 +18,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 class DemoApplicationTests {
@@ -103,7 +108,7 @@ class DemoApplicationTests {
      * 入库十大流通股东信息到数据库
      * @throws Exception
      */
-    @Test
+   // @Test
     void testQueryFlow() throws Exception {
         List<Stock> stockList=stockMapper.selectAll();
         for (int j=0;j<stockList.size();j++){
@@ -498,7 +503,7 @@ class DemoApplicationTests {
 
     }
 
-    @Test
+   // @Test
     void queryConnect(){
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("夏重阳"));
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("张素芬"));
@@ -512,5 +517,63 @@ class DemoApplicationTests {
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("施玉庆"));
         moneyService.insertNiuSanConnect("施玉庆");
 
+    }
+
+    @Test
+    void queryLongHuData() throws Exception {
+        StockReq req=new StockReq();
+        req.setApi_name("top_inst");
+        req.setToken("d8265273e779951ec1d0270da4d72b4519f66b808082df418bbf9cad");
+        LongHuReq longHuReq=new LongHuReq();
+        longHuReq.setTrade_date("20261016");
+        req.setParams(longHuReq);
+
+        String result=utils.postJson("http://api.tushare.pro",req);
+        JSONObject jsonObject=new JSONObject(result);
+        JSONObject data=jsonObject.getJSONObject("data");
+        JSONArray jsonArray=data.getJSONArray("items");
+        List<LongHuBean> list=new ArrayList<>();
+        for (int index=0;index<jsonArray.length();index++){
+            LongHuBean bean=new LongHuBean();
+            JSONArray singleLonghu=jsonArray.getJSONArray(index);
+            bean.setTrade_date(singleLonghu.optString(0));
+            bean.setTs_code(singleLonghu.optString(1));
+            bean.setExalter(singleLonghu.optString(2));
+            bean.setBuy(singleLonghu.optString(3));
+            bean.setBuy_rate(singleLonghu.optString(4));
+            bean.setSell(singleLonghu.optString(5));
+            bean.setSell_rate(singleLonghu.optString(6));
+            bean.setNet_buy(singleLonghu.optString(7));
+            bean.setSide(singleLonghu.optString(8));
+            bean.setReason(singleLonghu.optString(9));
+            list.add(bean);
+        }
+    }
+
+
+    private List<LongHuCountBean> compareData(List<LongHuBean> list){
+        List<LongHuCountBean> longHuCountBeans=new ArrayList<>();
+        String currentCode="";
+        for (LongHuBean bean : list) {
+            if (!Objects.equals(bean.getTs_code(), currentCode)){
+                List<Stock> stocks=stockMapper.queryStockByTsCode(bean.getTs_code());
+                LongHuCountBean longHuCountBean=new LongHuCountBean();
+                if (!stocks.isEmpty()){
+                    longHuCountBean.setStockCode(stocks.get(0).getSymbol());
+                    longHuCountBean.setStockName(stocks.get(0).getName());
+                }
+                longHuCountBeans.add(longHuCountBean);
+            }
+            longHuCountBeans.get(longHuCountBeans.size()-1).getStockLonghu().add(bean);
+            currentCode=bean.getTs_code();
+        }
+        return longHuCountBeans;
+    }
+
+
+
+    private String getCurrentDate(){
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyyMMdd");
+        return dateFormat.format(new Date());
     }
 }

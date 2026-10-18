@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.dto.ResponseDTO;
+import org.example.entity.LongHuCountBean;
 import org.example.entity.NiuSanConnect;
 import org.example.resp.NiuSanResp;
 import org.example.service.MoneyService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +53,13 @@ public class MoneyController {
         return ResponseDTO.success(moneyService.getNiuSanConnectByName(type));
     }
 
-
+    @GetMapping("longhu/{time}")
+    public ResponseDTO<List<LongHuCountBean>> getLongHuByTime(@PathVariable String time){
+        try {
+            return ResponseDTO.success(moneyService.getLongHuByTime(time));
+        }catch (Exception e){
+            return ResponseDTO.success(new ArrayList<>());
+        }
+    }
 
 }
