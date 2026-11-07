@@ -9,7 +9,7 @@ import java.util.List;
 public class LongHuCountBean {
     private String StockCode;
     private String StockName;
-    List<LongHuBean> stockLonghuBuy=new ArrayList<>();
-    List<LongHuBean> stockLonghuSell=new ArrayList<>();
+    List<String> stockLonghuBuy=new ArrayList<>();
+    List<String> stockLonghuSell=new ArrayList<>();
 
 }

@@ -70,7 +70,7 @@ class DemoApplicationTests {
     /**
      * 入库股票代码
      */
-    @Test
+    //@Test
     void testQueryStock(){
          StockReq req=new StockReq();
         req.setApi_name("stock_basic");
@@ -108,10 +108,10 @@ class DemoApplicationTests {
      * 入库十大流通股东信息到数据库
      * @throws Exception
      */
-   // @Test
+    //@Test
     void testQueryFlow() throws Exception {
         List<Stock> stockList=stockMapper.selectAll();
-        for (int j=0;j<stockList.size();j++){
+        for (int j=3104;j<stockList.size();j++){
             Stock stock=stockList.get(j);
             StockReq req=new StockReq();
             req.setApi_name("top10_floatholders");
@@ -503,7 +503,7 @@ class DemoApplicationTests {
 
     }
 
-   // @Test
+    @Test
     void queryConnect(){
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("夏重阳"));
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("张素芬"));
@@ -519,7 +519,7 @@ class DemoApplicationTests {
 
     }
 
-    @Test
+    //@Test
     void queryLongHuData() throws Exception {
         StockReq req=new StockReq();
         req.setApi_name("top_inst");
@@ -564,7 +564,7 @@ class DemoApplicationTests {
                 }
                 longHuCountBeans.add(longHuCountBean);
             }
-            longHuCountBeans.get(longHuCountBeans.size()-1).getStockLonghu().add(bean);
+            longHuCountBeans.get(longHuCountBeans.size()-1).getStockLonghuBuy().add(bean);
             currentCode=bean.getTs_code();
         }
         return longHuCountBeans;

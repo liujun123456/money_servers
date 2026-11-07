@@ -1,9 +1,6 @@
 package org.example.service.impl;
 
-import org.example.entity.LongHuBean;
-import org.example.entity.LongHuCountBean;
-import org.example.entity.NiuSanConnect;
-import org.example.entity.Stock;
+import org.example.entity.*;
 import org.example.mapper.NewFlowInvestorMapper;
 import org.example.mapper.NiuSanConnectMapper;
 import org.example.mapper.StockMapper;
@@ -360,7 +357,7 @@ public class MoneyServiceImpl implements MoneyService {
         req.setApi_name("top_inst");
         req.setToken("d8265273e779951ec1d0270da4d72b4519f66b808082df418bbf9cad");
         LongHuReq longHuReq=new LongHuReq();
-        longHuReq.setTrade_date("20261016");
+        longHuReq.setTrade_date(time);
         req.setParams(longHuReq);
 
         String result=utils.postJson("http://api.tushare.pro",req);
@@ -390,26 +387,98 @@ public class MoneyServiceImpl implements MoneyService {
 
     private List<LongHuCountBean> compareData(List<LongHuBean> list){
         List<LongHuCountBean> longHuCountBeans=new ArrayList<>();
-        String currentCode="";
-        for (LongHuBean bean : list) {
-            if (!Objects.equals(bean.getTs_code(), currentCode)){
+        List<LongHuBean> localLongHu=buildLocalData(list);   //获取匹配上本地标记的营业部  所有龙虎榜数据
+        Map<String,Integer> indexMap=new HashMap<>();
+        for (int index=0;index<localLongHu.size();index++){
+            LongHuBean bean=localLongHu.get(index);
+            if (indexMap.containsKey(bean.getTs_code())){
+                int mapIndex=indexMap.get(bean.getTs_code());
+                if (bean.getSide().equals("0")){
+                    if (!longHuCountBeans.get(mapIndex).getStockLonghuBuy().contains(bean.getExalter())){
+                        longHuCountBeans.get(mapIndex).getStockLonghuBuy().add(bean.getExalter());
+                    }
+
+                }else {
+                    if (!longHuCountBeans.get(mapIndex).getStockLonghuSell().contains(bean.getExalter())){
+                        longHuCountBeans.get(mapIndex).getStockLonghuSell().add(bean.getExalter());
+                    }
+                }
+            }else {
                 List<Stock> stocks=stockMapper.queryStockByTsCode(bean.getTs_code());
                 LongHuCountBean longHuCountBean=new LongHuCountBean();
                 if (!stocks.isEmpty()){
                     longHuCountBean.setStockCode(stocks.get(0).getSymbol());
                     longHuCountBean.setStockName(stocks.get(0).getName());
                 }
+                if (bean.getSide().equals("0")){
+                    longHuCountBean.getStockLonghuBuy().add(bean.getExalter());
+                }else {
+                    longHuCountBean.getStockLonghuSell().add(bean.getExalter());
+                }
                 longHuCountBeans.add(longHuCountBean);
+                indexMap.put(bean.getTs_code(),longHuCountBeans.size()-1);
             }
-//            if (bean.getSide().equals("0")){
-//                longHuCountBeans.get(longHuCountBeans.size()-1).getStockLonghuBuy().add(bean);
-//            }else {
-//                longHuCountBeans.get(longHuCountBeans.size()-1).getStockLonghuSell().add(bean);
-//            }
-            longHuCountBeans.get(longHuCountBeans.size()-1).getStockLonghuBuy().add(bean);
-
-            currentCode=bean.getTs_code();
         }
+        System.out.print(longHuCountBeans);
         return longHuCountBeans;
+    }
+
+
+    private List<LongHuBean>  buildLocalData(List<LongHuBean> list){
+        List<LongHuBean> longHuWithCodes=new ArrayList<>();
+        List<String> localLh=getLocalLongHuList();
+        for (LongHuBean bean : list) {
+            if (localLh.contains(bean.getExalter())){
+                longHuWithCodes.add(bean);
+            }
+        }
+        return longHuWithCodes;
+    }
+
+    private List<String>  getLocalLongHuList(){
+        String localLh="国泰海通证券股份有限公司，中信证券股份有限公司上海分公司，国信证券股份有限公司浙江互联网分公司，华宝证券股份有限公司上海东大名路证券营业部，国泰海通证券股份有限公司武汉紫阳东路证券营业部，" +
+                "国泰海通证券股份有限公司北京知春路证券营业部，国泰海通证券股份有限公司上海长宁区江苏路证券营业部，国泰海通证券股份有限公司南京太平南路证券营业部，国泰海通证券股份有限公司成都天府大道证券营业部，" +
+                "国泰海通证券股份有限公司上海分公司，国泰海通证券股份有限公司成都双庆路证券营业部，国新证券股份有限公司北京分公司，国泰海通证券股份有限公司上海松江区中山东路证券营业部，" +
+                "东方证券股份有限公司上海松江区沪亭北路证券营业部，国泰海通证券股份有限公司湛江万豪世家证券营业部，中信证券股份有限公司深圳深南中路中信大厦证券营业部，国泰海通证券股份有限公司上海自贸试验区第二分公司，" +
+                "国金证券股份有限公司深圳分公司，国泰海通证券股份有限公司上海静安区新闸路证券营业部，国盛证券股份有限公司宁波桑田路证券营业部，平安证券股份有限公司杭州曙光路证券营业部，" +
+                "国泰海通证券股份有限公司宜昌沿江大道证券营业部，招商证券股份有限公司深圳益田路免税商务大厦证券营业部，华泰证券股份有限公司苏州吴中大道证券营业部，中信证券股份有限公司浙江分公司，" +
+                "东亚前海证券有限责任公司苏州分公司，广发证券股份有限公司杭州富春路证券营业部，中国银河证券股份有限公司大连黄河路证券营业部，华泰证券股份有限公司深圳前海证券营业部，" +
+                "国信证券股份有限公司深圳互联网分公司，国泰海通证券股份有限公司上海浦东新区海阳西路证券营业部，东莞证券股份有限公司南京分公司，国泰海通证券股份有限公司三亚迎宾路证券营业部，" +
+                "中信建投证券股份有限公司上海营口路证券营业部，浙商证券股份有限公司杭州五星路证券营业部，平安证券股份有限公司浙江分公司，爱建证券有限责任公司上海浦东新区前滩大道证券营业部，" +
+                "国联民生证券股份有限公司宁波分公司，中国银河证券股份有限公司北京中关村大街证券营业部，国泰海通证券股份有限公司天津高新区梅苑路证券营业部，广发证券股份有限公司郑州农业路证券营业部，" +
+                "中国国际金融股份有限公司北京建国门外大街证券营业部，华泰证券股份有限公司岳阳岳阳大道证券营业部，中国银河证券股份有限公司北京学院南路证券营业部，国新证券股份有限公司北京亦庄证券营业部，" +
+                "广发证券股份有限公司深圳后海证券营业部，东吴证券股份有限公司苏州相城大道证券营业部，华泰证券股份有限公司上海武定路证券营业部，国盛证券股份有限公司杭州建设三路证券营业部，" +
+                "东北证券股份有限公司佛山分公司，华源证券股份有限公司江苏分公司，国信证券股份有限公司深圳红岭中路证券营业部，东亚前海证券有限责任公司上海分公司，东方证券股份有限公司无锡梁清路证券营业部，" +
+                "长江证券股份有限公司上海分公司，东方证券股份有限公司深圳金田路证券营业部，中信建投证券股份有限公司安徽分公司，国泰海通证券股份有限公司上海徐汇区宜山路证券营业部，" +
+                "中信证券股份有限公司上海徐汇区漕溪北路证券营业部，中信证券股份有限公司西安朱雀大街证券营业部，中国银河证券股份有限公司绍兴鲁迅中路证券营业部，长城证券股份有限公司深圳华为稼先路证券营业部，" +
+                "中泰证券股份有限公司湖北分公司，东亚前海证券有限责任公司深圳分公司，国联民生证券股份有限公司北京分公司，中信证券股份有限公司杭州延安路证券营业部，" +
+                "华泰证券股份有限公司北京东三环北路证券营业部，华泰证券股份有限公司深圳益田路荣超商务中心证券营业部，东方证券股份有限公司杭州龙井路证券营业部，国泰海通证券股份有限公司深圳海岸城海德三道证券营业部，" +
+                "中信建投证券股份有限公司杭州庆春路证券营业部，中泰证券股份有限公司常州惠国路证券营业部，国联民生证券股份有限公司慈溪影清路证券营业部，中信证券股份有限公司东阳吴宁西路证券营业部，" +
+                "联储证券股份有限公司杭州环城北路证券营业部，国泰海通证券股份有限公司宁波广福街证券营业部，广发证券股份有限公司上海浦东新区东方路证券营业部，国泰海通证券股份有限公司余姚舜水南路证券营业部，" +
+                "东方证券股份有限公司厦门仙岳路证券营业部，华泰证券股份有限公司深圳彩田路证券营业部，中信证券股份有限公司深圳滨海大道证券营业部，国元证券股份有限公司上海虹桥路证券营业部，平安证券股份有限公司深圳分公司，" +
+                "中国银河证券股份有限公司厦门湖滨中路证券营业部，华泰证券股份有限公司上海普陀区江宁路证券营业部，浙商证券股份有限公司宁波分公司，中国银河证券股份有限公司宜昌新世纪证券营业部，" +
+                "招商证券股份有限公司北京建国路证券营业部，东吴证券股份有限公司上海西藏南路证券营业部，国泰海通证券股份有限公司成都龙腾东路证券营业部，国泰海通证券股份有限公司重庆解放碑证券营业部，" +
+                "东海证券股份有限公司福州长乐北路证券营业部，国投证券股份有限公司西安曲江池南路证券营业部，国信证券股份有限公司深圳泰然九路证券营业部，华泰证券股份有限公司上海浦东新区世纪大道证券营业部，" +
+                "长江证券股份有限公司上海浦东新区东明路证券营业部，国联民生证券股份有限公司宁波财神殿南路证券营业部，中国中金财富证券有限公司湖南分公司，国泰海通证券股份有限公司无锡湖滨路证券营业部，" +
+                "招商证券股份有限公司深圳深南大道车公庙证券营业部，中信证券股份有限公司上海虹口区溧阳路证券营业部，中信证券股份有限公司深圳分公司，东莞证券股份有限公司四川分公司，" +
+                "中信建投证券股份有限公司北京东城分公司，甬兴证券有限公司宁波和源路证券营业部，中信证券股份有限公司杭州凤起路证券营业部，广发证券股份有限公司台州东海大道证券营业部，" +
+                "华泰证券股份有限公司北京西三环国际财经中心证券营业部，华创证券有限责任公司北京西直门证券营业部，平安证券股份有限公司宁波海晏北路证券营业部，申万宏源证券有限公司深圳彩田路证券营业部，" +
+                "中泰证券股份有限公司浙江分公司，方正证券股份有限公司重庆金开大道证券营业部，中信证券股份有限公司北京分公司，国投证券股份有限公司西安朱雀大街证券营业部，国信证券股份有限公司北京分公司，" +
+                "联储证券股份有限公司杭州西湖桃源岭证券营业部，华林证券股份有限公司北京分公司，广发证券股份有限公司佛山顺德诚德路证券营业部，东方证券股份有限公司上海浦东新区源深路证券营业部，" +
+                "国泰海通证券股份有限公司深圳福田中心区华融大厦证券营业部，华泰证券股份有限公司天津东丽开发区二纬路证券营业部，招商证券股份有限公司深圳南山南油大道证券营业部，东方证券股份有限公司东方资财，" +
+                "天风证券股份有限公司上海浦东分公司，国泰海通证券股份有限公司上海长宁区天山路证券营业部，中泰证券股份有限公司深圳分公司，联储证券股份有限公司上海松林路证券营业部，兴业证券股份有限公司深圳分公司，" +
+                "中信证券股份有限公司北京安外大街证券营业部，国投证券股份有限公司梅州分公司，联储证券股份有限公司宁波分公司，上海证券有限责任公司上海分公司，东亚前海证券有限责任公司浙江分公司，" +
+                "中信证券股份有限公司上海闵行区万源路证券营业部，国金证券股份有限公司成都武成大街证券营业部，广发证券股份有限公司深圳福华一路证券营业部，华泰证券股份有限公司北京月坛南街证券营业部，" +
+                "中国银河证券股份有限公司三亚迎宾路证券营业部，长城证券股份有限公司西北分公司，国泰海通证券股份有限公司东莞总部一路证券营业部，国投证券股份有限公司深圳红荔西路证券营业部，" +
+                "华源证券股份有限公司深圳分公司，华泰证券股份有限公司深圳深南大道基金大厦证券营业部，平安证券股份有限公司深圳香蜜湖证券营业部，国泰海通证券股份有限公司南京胜利路证券营业部，" +
+                "华福证券股份有限公司南京胜太路证券营业部，国泰海通证券股份有限公司上海浦东新区陆家嘴东路证券营业部，上海证券有限责任公司崇明区堡镇中路证券营业部，广发证券股份有限公司西安南广济街证券营业部，" +
+                "国金证券股份有限公司上海静安区南京西路证券营业部，光大证券股份有限公司深圳深湾一路证券营业部，东吴证券股份有限公司苏州工业园区扬富路证券营业部，" +
+                "国泰海通证券股份有限公司广州东风中路证券营业部，华泰证券股份有限公司江西分公司，东方证券股份有限公司张家港东环路证券营业部，中国银河证券股份有限公司上海杨浦区靖宇东路证券营业部，" +
+                "国泰海通证券股份有限公司广州琶洲证券营业部，国泰海通证券股份有限公司西安雁展路证券营业部，申万宏源证券有限公司上海静安区康定路证券营业部，中信证券股份有限公司北京建国门证券营业部，" +
+                "广发证券股份有限公司，国盛证券股份有限公司上海浦东新区世纪大道证券营业部，国泰海通证券股份有限公司重庆观音桥步行街证券营业部，麦高证券有限责任公司北京分公司，" +
+                "平安证券股份有限公司深圳深南东路罗湖商务中心证券营业部，中国银河证券股份有限公司南京洪武路证券营业部，东方证券股份有限公司深圳深南大道证券营业部，申港证券股份有限公司四川分公司，" +
+                "华泰证券股份有限公司天津河东金茂广场证券营业部";
+        String[] lhList=localLh.split("，");
+        return Arrays.asList(lhList);
     }
 }
