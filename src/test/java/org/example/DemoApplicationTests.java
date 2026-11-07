@@ -503,7 +503,7 @@ class DemoApplicationTests {
 
     }
 
-    @Test
+//    @Test
     void queryConnect(){
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("夏重阳"));
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("张素芬"));
@@ -519,61 +519,4 @@ class DemoApplicationTests {
 
     }
 
-    //@Test
-    void queryLongHuData() throws Exception {
-        StockReq req=new StockReq();
-        req.setApi_name("top_inst");
-        req.setToken("d8265273e779951ec1d0270da4d72b4519f66b808082df418bbf9cad");
-        LongHuReq longHuReq=new LongHuReq();
-        longHuReq.setTrade_date("20261016");
-        req.setParams(longHuReq);
-
-        String result=utils.postJson("http://api.tushare.pro",req);
-        JSONObject jsonObject=new JSONObject(result);
-        JSONObject data=jsonObject.getJSONObject("data");
-        JSONArray jsonArray=data.getJSONArray("items");
-        List<LongHuBean> list=new ArrayList<>();
-        for (int index=0;index<jsonArray.length();index++){
-            LongHuBean bean=new LongHuBean();
-            JSONArray singleLonghu=jsonArray.getJSONArray(index);
-            bean.setTrade_date(singleLonghu.optString(0));
-            bean.setTs_code(singleLonghu.optString(1));
-            bean.setExalter(singleLonghu.optString(2));
-            bean.setBuy(singleLonghu.optString(3));
-            bean.setBuy_rate(singleLonghu.optString(4));
-            bean.setSell(singleLonghu.optString(5));
-            bean.setSell_rate(singleLonghu.optString(6));
-            bean.setNet_buy(singleLonghu.optString(7));
-            bean.setSide(singleLonghu.optString(8));
-            bean.setReason(singleLonghu.optString(9));
-            list.add(bean);
-        }
-    }
-
-
-    private List<LongHuCountBean> compareData(List<LongHuBean> list){
-        List<LongHuCountBean> longHuCountBeans=new ArrayList<>();
-        String currentCode="";
-        for (LongHuBean bean : list) {
-            if (!Objects.equals(bean.getTs_code(), currentCode)){
-                List<Stock> stocks=stockMapper.queryStockByTsCode(bean.getTs_code());
-                LongHuCountBean longHuCountBean=new LongHuCountBean();
-                if (!stocks.isEmpty()){
-                    longHuCountBean.setStockCode(stocks.get(0).getSymbol());
-                    longHuCountBean.setStockName(stocks.get(0).getName());
-                }
-                longHuCountBeans.add(longHuCountBean);
-            }
-            longHuCountBeans.get(longHuCountBeans.size()-1).getStockLonghuBuy().add(bean);
-            currentCode=bean.getTs_code();
-        }
-        return longHuCountBeans;
-    }
-
-
-
-    private String getCurrentDate(){
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyyMMdd");
-        return dateFormat.format(new Date());
-    }
 }
