@@ -353,6 +353,7 @@ public class MoneyServiceImpl implements MoneyService {
 
     @Override
     public List<LongHuCountBean> getLongHuByTime(String time) throws Exception{
+        time=time.replaceAll("-","");
         StockReq req=new StockReq();
         req.setApi_name("top_inst");
         req.setToken("d8265273e779951ec1d0270da4d72b4519f66b808082df418bbf9cad");
@@ -405,18 +406,18 @@ public class MoneyServiceImpl implements MoneyService {
                 }
             }else {
                 List<Stock> stocks=stockMapper.queryStockByTsCode(bean.getTs_code());
-                LongHuCountBean longHuCountBean=new LongHuCountBean();
                 if (!stocks.isEmpty()){
+                    LongHuCountBean longHuCountBean=new LongHuCountBean();
                     longHuCountBean.setStockCode(stocks.get(0).getSymbol());
                     longHuCountBean.setStockName(stocks.get(0).getName());
+                    if (bean.getSide().equals("0")){
+                        longHuCountBean.getStockLonghuBuy().add(bean.getExalter());
+                    }else {
+                        longHuCountBean.getStockLonghuSell().add(bean.getExalter());
+                    }
+                    longHuCountBeans.add(longHuCountBean);
+                    indexMap.put(bean.getTs_code(),longHuCountBeans.size()-1);
                 }
-                if (bean.getSide().equals("0")){
-                    longHuCountBean.getStockLonghuBuy().add(bean.getExalter());
-                }else {
-                    longHuCountBean.getStockLonghuSell().add(bean.getExalter());
-                }
-                longHuCountBeans.add(longHuCountBean);
-                indexMap.put(bean.getTs_code(),longHuCountBeans.size()-1);
             }
         }
         System.out.print(longHuCountBeans);
