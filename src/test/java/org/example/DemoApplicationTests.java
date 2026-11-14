@@ -19,10 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
@@ -40,6 +39,9 @@ class DemoApplicationTests {
 
     @Autowired
     private KongPanMapper kongPanMapper;
+
+    @Autowired
+    private LonghuMapper longhuMapper;
 
     @Autowired
     private HttpUtils utils;
@@ -517,6 +519,72 @@ class DemoApplicationTests {
 //        niuSanConnectList.addAll(niuSanConnectMapper.queryConnectByName("施玉庆"));
         moneyService.insertNiuSanConnect("施玉庆");
 
+    }
+
+    @Test
+    void queryLonghu() throws Exception {
+
+        List<Stock> stockList=stockMapper.selectAll();
+        Map<String,Stock> stockMap=new HashMap<>();
+        for (Stock stock : stockList) {
+            stockMap.put(stock.getTsCode(),stock);
+        }
+        LocalDate start = LocalDate.of(2018, 1, 1);
+        LocalDate end   = LocalDate.of(2026, 11, 14);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+            requestLonghuByTime(d.format(fmt),stockMap);
+        }
+
+    }
+
+    private void  requestLonghuByTime(String time,Map<String,Stock> stockMap)throws Exception{
+        StockReq req=new StockReq();
+        req.setApi_name("top_inst");
+        req.setToken("d8265273e779951ec1d0270da4d72b4519f66b808082df418bbf9cad");
+        LongHuReq longHuReq=new LongHuReq();
+        longHuReq.setTrade_date(time);
+        req.setParams(longHuReq);
+
+        String result=utils.postJson("http://api.tushare.pro",req);
+        JSONObject jsonObject=new JSONObject(result);
+
+        JSONObject data=jsonObject.getJSONObject("data");
+        System.out.println(data);
+        JSONArray jsonArray=data.getJSONArray("items");
+        List<LongHuBean> list=new ArrayList<>();
+
+        for (int index=0;index<jsonArray.length();index++){
+            JSONArray singleLonghu=jsonArray.getJSONArray(index);
+            String ts_code=singleLonghu.optString(1);
+            if (ts_code.startsWith("688")||ts_code.startsWith("920")||!stockMap.containsKey(ts_code)){
+               continue;
+            }
+
+            LongHuBean bean=new LongHuBean();
+            bean.setTradeDate(singleLonghu.optString(0));
+            bean.setTsCode(singleLonghu.optString(1));
+            bean.setExalter(singleLonghu.optString(2));
+            bean.setBuy(String.format("%.0f",singleLonghu.optDouble(3,0d)));
+            bean.setBuyRate(singleLonghu.optString(4));
+            bean.setSell(String.format("%.0f",singleLonghu.optDouble(5,0d)));
+            bean.setSellRate(singleLonghu.optString(6));
+            bean.setNetBuy(String.format("%.0f",singleLonghu.optDouble(7,0d)));
+            bean.setSide(singleLonghu.optString(8));
+            bean.setReason(singleLonghu.optString(9));
+            bean.setSymbol(stockMap.get(ts_code).getSymbol());
+            bean.setSymbolName(stockMap.get(ts_code).getName());
+            list.add(bean);
+
+        }
+        if (list.size()>0){
+            longhuMapper.batchInsert(list);
+        }
+
+        System.out.println("------>打印时间--"+time);
+
+        Thread.sleep(1000);
     }
 
 }

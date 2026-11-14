@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import org.example.entity.*;
+import org.example.mapper.LonghuMapper;
 import org.example.mapper.NewFlowInvestorMapper;
 import org.example.mapper.NiuSanConnectMapper;
 import org.example.mapper.StockMapper;
@@ -31,6 +32,9 @@ public class MoneyServiceImpl implements MoneyService {
 
     @Autowired
     private StockMapper stockMapper;
+
+    @Autowired
+    private LonghuMapper longhuMapper;
 
     @Override
     public List<NiuSanResp> queryNiuSanByName(String name) {
@@ -352,6 +356,12 @@ public class MoneyServiceImpl implements MoneyService {
     }
 
     @Override
+    public List<LongHuBean> selectLhByName(String name) {
+        List<LongHuBean> result=longhuMapper.selectByLh(name);
+        return result;
+    }
+
+    @Override
     public List<LongHuCountBean> getLongHuByTime(String time) throws Exception{
         time=time.replaceAll("-","");
         StockReq req=new StockReq();
@@ -371,14 +381,14 @@ public class MoneyServiceImpl implements MoneyService {
         for (int index=0;index<jsonArray.length();index++){
             LongHuBean bean=new LongHuBean();
             JSONArray singleLonghu=jsonArray.getJSONArray(index);
-            bean.setTrade_date(singleLonghu.optString(0));
-            bean.setTs_code(singleLonghu.optString(1));
+            bean.setTradeDate(singleLonghu.optString(0));
+            bean.setTsCode(singleLonghu.optString(1));
             bean.setExalter(singleLonghu.optString(2));
             bean.setBuy(singleLonghu.optString(3));
-            bean.setBuy_rate(singleLonghu.optString(4));
+            bean.setBuyRate(singleLonghu.optString(4));
             bean.setSell(singleLonghu.optString(5));
-            bean.setSell_rate(singleLonghu.optString(6));
-            bean.setNet_buy(singleLonghu.optString(7));
+            bean.setSellRate(singleLonghu.optString(6));
+            bean.setNetBuy(singleLonghu.optString(7));
             bean.setSide(singleLonghu.optString(8));
             bean.setReason(singleLonghu.optString(9));
             list.add(bean);
@@ -392,20 +402,28 @@ public class MoneyServiceImpl implements MoneyService {
         Map<String,Integer> indexMap=new HashMap<>();
         for (int index=0;index<localLongHu.size();index++){
             LongHuBean bean=localLongHu.get(index);
-            if (indexMap.containsKey(bean.getTs_code())){
-                int mapIndex=indexMap.get(bean.getTs_code());
+            if (indexMap.containsKey(bean.getTsCode())){
+                int mapIndex=indexMap.get(bean.getTsCode());
                 if (bean.getSide().equals("0")){
-                    if (!longHuCountBeans.get(mapIndex).getStockLonghuBuy().contains(bean.getExalter())){
+                    if (!longHuCountBeans.get(mapIndex).getStockLonghuBuy().contains(bean.getExalter())&&!bean.getExalter().equals("机构专用")){
+                        longHuCountBeans.get(mapIndex).getStockLonghuBuy().add(bean.getExalter());
+                    }
+
+                    if (bean.getExalter().equals("机构专用")){
                         longHuCountBeans.get(mapIndex).getStockLonghuBuy().add(bean.getExalter());
                     }
 
                 }else {
-                    if (!longHuCountBeans.get(mapIndex).getStockLonghuSell().contains(bean.getExalter())){
+                    if (!longHuCountBeans.get(mapIndex).getStockLonghuSell().contains(bean.getExalter())&&!bean.getExalter().equals("机构专用")){
+                        longHuCountBeans.get(mapIndex).getStockLonghuSell().add(bean.getExalter());
+                    }
+
+                    if (bean.getExalter().equals("机构专用")){
                         longHuCountBeans.get(mapIndex).getStockLonghuSell().add(bean.getExalter());
                     }
                 }
             }else {
-                List<Stock> stocks=stockMapper.queryStockByTsCode(bean.getTs_code());
+                List<Stock> stocks=stockMapper.queryStockByTsCode(bean.getTsCode());
                 if (!stocks.isEmpty()){
                     LongHuCountBean longHuCountBean=new LongHuCountBean();
                     longHuCountBean.setStockCode(stocks.get(0).getSymbol());
@@ -416,7 +434,7 @@ public class MoneyServiceImpl implements MoneyService {
                         longHuCountBean.getStockLonghuSell().add(bean.getExalter());
                     }
                     longHuCountBeans.add(longHuCountBean);
-                    indexMap.put(bean.getTs_code(),longHuCountBeans.size()-1);
+                    indexMap.put(bean.getTsCode(),longHuCountBeans.size()-1);
                 }
             }
         }
@@ -478,7 +496,7 @@ public class MoneyServiceImpl implements MoneyService {
                 "国泰海通证券股份有限公司广州琶洲证券营业部，国泰海通证券股份有限公司西安雁展路证券营业部，申万宏源证券有限公司上海静安区康定路证券营业部，中信证券股份有限公司北京建国门证券营业部，" +
                 "广发证券股份有限公司，国盛证券股份有限公司上海浦东新区世纪大道证券营业部，国泰海通证券股份有限公司重庆观音桥步行街证券营业部，麦高证券有限责任公司北京分公司，" +
                 "平安证券股份有限公司深圳深南东路罗湖商务中心证券营业部，中国银河证券股份有限公司南京洪武路证券营业部，东方证券股份有限公司深圳深南大道证券营业部，申港证券股份有限公司四川分公司，" +
-                "华泰证券股份有限公司天津河东金茂广场证券营业部，国泰海通证券股份有限公司深圳分公司华富路证券营业部";
+                "华泰证券股份有限公司天津河东金茂广场证券营业部，国泰海通证券股份有限公司深圳分公司华富路证券营业部，机构专用";
         String[] lhList=localLh.split("，");
         return Arrays.asList(lhList);
     }

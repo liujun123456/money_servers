@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.dto.ResponseDTO;
+import org.example.entity.LongHuBean;
 import org.example.entity.LongHuCountBean;
 import org.example.entity.NiuSanConnect;
 import org.example.resp.NiuSanResp;
@@ -57,6 +58,15 @@ public class MoneyController {
     public ResponseDTO<List<LongHuCountBean>> getLongHuByTime(@PathVariable String time){
         try {
             return ResponseDTO.success(moneyService.getLongHuByTime(time));
+        }catch (Exception e){
+            return ResponseDTO.success(new ArrayList<>());
+        }
+    }
+
+    @GetMapping("longhu/list/{name}")
+    public ResponseDTO<List<LongHuBean>> getLongHuByName(@PathVariable String name){
+        try {
+            return ResponseDTO.success(moneyService.selectLhByName(name));
         }catch (Exception e){
             return ResponseDTO.success(new ArrayList<>());
         }

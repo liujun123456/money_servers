@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.LonghuMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="org.example.entity.LongHuBean">
+        <id column="id" property="id" />
+        <result column="ts_code" property="tsCode" />
+        <result column="symbol" property="symbol" />
+        <result column="symbol_name" property="symbolName" />
+        <result column="trade_date" property="tradeDate" />
+        <result column="exalter" property="exalter" />
+        <result column="side" property="side" />
+        <result column="buy" property="buy" />
+        <result column="buy_rate" property="buyRate" />
+        <result column="sell" property="sell" />
+        <result column="sell_rate" property="sellRate" />
+        <result column="net_buy" property="netBuy" />
+        <result column="reason" property="reason" />
+    </resultMap>
+
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO longhu_table(ts_code, symbol,symbol_name,trade_date, exalter, side, buy,buy_rate,sell,sell_rate,net_buy,reason)
+        VALUES
+        <foreach collection="longHuBeanList" item="longhu" separator=",">
+            (#{longhu.tsCode},#{longhu.symbol}, #{longhu.symbolName},  #{longhu.tradeDate}, #{longhu.exalter},
+            #{longhu.side}, #{longhu.buy}, #{longhu.buyRate}, #{longhu.sell}, #{longhu.sellRate}, #{longhu.netBuy}, #{longhu.reason})
+        </foreach>
+    </insert>
+</mapper>

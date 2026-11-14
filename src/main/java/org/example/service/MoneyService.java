@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.entity.LongHuBean;
 import org.example.entity.LongHuCountBean;
 import org.example.entity.NewFlowInvertor;
 import org.example.entity.NiuSanConnect;
@@ -23,6 +24,8 @@ public interface MoneyService {
     List<NiuSanConnect> getNiuSanConnectByName(String type);
 
     List<LongHuCountBean> getLongHuByTime(String time) throws Exception;
+
+    List<LongHuBean> selectLhByName(String name);
 
 
     void insertNiuSanConnect(String name);
