@@ -7,6 +7,7 @@ import org.example.mapper.NiuSanConnectMapper;
 import org.example.mapper.StockMapper;
 import org.example.req.LongHuReq;
 import org.example.req.StockReq;
+import org.example.resp.LhResp;
 import org.example.resp.NiuSanResp;
 import org.example.service.MoneyService;
 import org.example.utils.HttpUtils;
@@ -356,9 +357,16 @@ public class MoneyServiceImpl implements MoneyService {
     }
 
     @Override
-    public List<LongHuBean> selectLhByName(String name) {
-        List<LongHuBean> result=longhuMapper.selectByLh(name);
-        return result;
+    public LhResp selectLhByName(String name,int page) {
+        LhResp resp=new LhResp();
+        int offset=(page-1)*100;
+        int count=longhuMapper.selectLhCount(name);
+        int totalPage=(count/100)+1;
+        resp.setCurrentPage(page);
+        resp.setTotalPage(totalPage);
+        List<LongHuBean> result=longhuMapper.selectByLh(name,offset);
+        resp.setResult(result);
+        return resp;
     }
 
     @Override

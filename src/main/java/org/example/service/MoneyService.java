@@ -4,6 +4,7 @@ import org.example.entity.LongHuBean;
 import org.example.entity.LongHuCountBean;
 import org.example.entity.NewFlowInvertor;
 import org.example.entity.NiuSanConnect;
+import org.example.resp.LhResp;
 import org.example.resp.NiuSanResp;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public interface MoneyService {
 
     List<LongHuCountBean> getLongHuByTime(String time) throws Exception;
 
-    List<LongHuBean> selectLhByName(String name);
+    LhResp selectLhByName(String name, int page);
 
 
     void insertNiuSanConnect(String name);

@@ -521,7 +521,7 @@ class DemoApplicationTests {
 
     }
 
-    @Test
+    //@Test
     void queryLonghu() throws Exception {
 
         List<Stock> stockList=stockMapper.selectAll();

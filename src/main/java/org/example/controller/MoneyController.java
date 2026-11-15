@@ -4,6 +4,7 @@ import org.example.dto.ResponseDTO;
 import org.example.entity.LongHuBean;
 import org.example.entity.LongHuCountBean;
 import org.example.entity.NiuSanConnect;
+import org.example.resp.LhResp;
 import org.example.resp.NiuSanResp;
 import org.example.service.MoneyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,12 +64,12 @@ public class MoneyController {
         }
     }
 
-    @GetMapping("longhu/list/{name}")
-    public ResponseDTO<List<LongHuBean>> getLongHuByName(@PathVariable String name){
+    @GetMapping("longhu/list/{name}/{page}")
+    public ResponseDTO<LhResp> getLongHuByName(@PathVariable String name,@PathVariable int page){
         try {
-            return ResponseDTO.success(moneyService.selectLhByName(name));
+            return ResponseDTO.success(moneyService.selectLhByName(name,page));
         }catch (Exception e){
-            return ResponseDTO.success(new ArrayList<>());
+            return ResponseDTO.success(new LhResp());
         }
     }
 
