@@ -387,10 +387,14 @@ public class MoneyServiceImpl implements MoneyService {
         JSONArray jsonArray=data.getJSONArray("items");
         List<LongHuBean> list=new ArrayList<>();
         for (int index=0;index<jsonArray.length();index++){
-            LongHuBean bean=new LongHuBean();
             JSONArray singleLonghu=jsonArray.getJSONArray(index);
+            String ts_code=singleLonghu.optString(1);
+            if (ts_code.startsWith("688")||ts_code.startsWith("920")){ //不查询北证和科创板
+                continue;
+            }
+            LongHuBean bean=new LongHuBean();
             bean.setTradeDate(singleLonghu.optString(0));
-            bean.setTsCode(singleLonghu.optString(1));
+            bean.setTsCode(ts_code);
             bean.setExalter(singleLonghu.optString(2));
             bean.setBuy(singleLonghu.optString(3));
             bean.setBuyRate(singleLonghu.optString(4));
